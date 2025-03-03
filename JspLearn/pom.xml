@@ -17,5 +17,6 @@
   </dependencies>
   <build>
     <finalName>JspLearn</finalName>
+    <sourceDirectory>src/main/java</sourceDirectory>
   </build>
 </project>

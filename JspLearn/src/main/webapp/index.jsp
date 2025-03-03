@@ -1,3 +1,5 @@
+<%@ page import="java.util.Date" %>
+<%@ page import="javax.xml.crypto.Data" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
@@ -5,7 +7,18 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 </head>
 <body>
-<h1>Hello World!</h1>
-<!-- 这里可以添加更多的HTML和JSP代码 -->
+<%!
+    int i = 0;
+%>
+<%
+    i++;
+%>
+<p>
+    您是第<%= i %>个访问这个页面的用户
+</p>
+<p>
+    今天的日期是
+    <%= new Date()%>
+</p>
 </body>
 </html>

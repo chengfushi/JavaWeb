@@ -231,4 +231,72 @@ java文件生成字节码文件，然后执行字节码文件响应客户的请�
 
 合理使用指令标记能提升JSP的可维护性和可读性，但需遵循MVC原则，将业务逻辑移至Servlet或Service层。
 
+---
+
 # 第三章 Tag文件与Tag标记
+## 3.1 Tag文件
+### 3.1.1 Tag文件的结构
+Tag文件通常以`.tag`或`.tagx`为扩展名，包含JSP代码、HTML/XML内容以及标签声明。其结构包括：  
+• **Tag声明**：使用`<%@ tag %>`指令定义标签属性。  
+• **JSP代码**：包含脚本、表达式等逻辑。  
+• **HTML/XML内容**：定义标签的输出内容。
+
+### 3.1.2 Tag文件的保存
+Tag文件通常保存在`/WEB-INF/tags`目录下，以便JSP页面通过`tagdir`属性引用。
+
+---
+
+## 3.2 Tag标记
+### 3.2.1 Tag标记与Tag文件
+Tag标记是JSP页面中调用Tag文件的语法，通过前缀和标签名引用Tag文件。
+
+### 3.2.2 Tag标记的使用
+在JSP页面中，使用`<%@ taglib %>`指令引入标签库，并通过`<prefix:tagname>`语法调用Tag文件。
+
+### 3.2.3 Tag标记的运行原理
+当JSP页面解析到Tag标记时，会查找对应的Tag文件，执行其中的逻辑，并将结果嵌入页面。
+
+---
+
+## 3.3 Tag文件中的常用指令
+### 3.3.1 tag指令
+用于定义Tag文件的基本属性，如`language`和`pageEncoding`。  
+示例：
+```jsp
+<%@ tag language="java" pageEncoding="UTF-8" %>
+```
+
+### 3.3.2 include指令
+用于在Tag文件中包含其他JSP或Tag文件。  
+示例：
+```jsp
+<%@ include file="header.jsp" %>
+```
+
+### 3.3.3 attribute指令
+用于定义Tag文件的属性，支持`required`、`type`等参数。  
+示例：
+```jsp
+<%@ attribute name="username" required="true" type="java.lang.String" %>
+```
+
+### 3.3.4 variable指令
+用于在Tag文件中定义变量，供JSP页面使用。  
+示例：
+```jsp
+<%@ variable name-given="result" scope="AT_END" %>
+```
+
+### 3.3.5 taglib指令
+用于在Tag文件中引入其他标签库。  
+示例：
+```jsp
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+```
+
+---
+
+## 总结
+Tag文件和Tag标记是JSP中实现自定义标签的核心机制。通过Tag文件封装逻辑，通过Tag标记调用功能，可以显著提高代码的重用性和可维护性。常用指令如`tag`、`attribute`、`variable`等，进一步增强了Tag文件的灵活性和功能性。
+
+---

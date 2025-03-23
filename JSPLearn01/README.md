@@ -1,4 +1,4 @@
-# 第一章JSP概述
+_# 第一章JSP概述
 ## 1.1什么是JSP
 JSP(Java Server Pages)是一种动态网页开发技术，它是由Sun Microsystems公司倡导、许多公司参与一起建立的一种使软件开发者可以响应客户
 端请求，而动态生成HTML、XML或其他格式文档的技术标准。
@@ -215,7 +215,7 @@ java文件生成字节码文件，然后执行字节码文件响应客户的请�
 - **优先使用JSTL/EL**：替代Java脚本，增强可读性（如用`<c:if>`替代`<% if(...) %>`）。
 - **错误处理规范**：
   ```jsp
-  <%@ page errorPage="/error.jsp" %>
+  <%@ page errorPage="/error.jsp" %>A
   <!-- error.jsp中需设置 -->
   <%@ page isErrorPage="true" %>
   ```
@@ -300,3 +300,120 @@ Tag标记是JSP页面中调用Tag文件的语法，通过前缀和标签名引�
 Tag文件和Tag标记是JSP中实现自定义标签的核心机制。通过Tag文件封装逻辑，通过Tag标记调用功能，可以显著提高代码的重用性和可维护性。常用指令如`tag`、`attribute`、`variable`等，进一步增强了Tag文件的灵活性和功能性。
 
 ---
+
+# 第四章 JSP内置对象
+有些成员变量不用声明就可以在JSP页面的脚本（Java程序片和Java表达式）中使用，这就是所谓的内置对象。内置对象有：resquest、response、session、out 、 application
+
+## 4.1request对象
+### 4.1.1获取用户提交的信息
+在JSP中，内置对象request封装了用户请求页面时所提交的信息，该对象调用相应的方法可以获取封装的信息.即**request对象**可以获取**用户提交的信息**。
+用户在请求JSP页面时，通常会使用HTML表单提交信息，表单的一般格式是：
+```jsp
+<FORM  method=get|post action="提交信息的目的地页面">提交手段</FORM>
+
+```
+
+
+例如用户提交信息表单：
+```jsp
+<FORM action="tom.jsp" method=post >
+	<INPUT type="text" name="boy" value="ok" >
+	 <INPUT TYPE="submit" value="送出" name="submit">
+</FORM> 
+```
+
+tom.jsp页面可以使用内置request对象获得用户提交的信息
+```jsp
+request.getParameter("boy");
+```
+---
+这里简单说一下get请求和post请求
+1. **GET请求**  
+   • **用途**：主要用于从服务器**获取资源**（如查询数据、加载页面），属于**只读操作**，不会修改服务器状态。  
+   • **数据传递**：参数附加在URL中，以`?key=value`形式拼接，多个参数用`&`连接，例如：  
+   `http://example.com/search?keyword=go&page=1`。
+2. **POST请求**  
+   • **用途**：用于向服务器**提交数据**（如注册、文件上传），属于**写操作**，可能改变服务器资源。  
+   • **数据传递**：参数存储在**请求体**（Request Body）中，不可见，需通过工具（如开发者工具）查看。
+
+| 特性         | GET请求               | POST请求           |
+| ---------- | ------------------- | ---------------- |
+| **数据位置**   | URL末尾（暴露可见）         | 请求体（隐藏）          |
+| **数据大小限制** | 受URL长度限制（通常≤2048字符） | 理论无限制（受服务器配置影响）  |
+| **安全性**    | 较低（易被日志、历史记录泄露）     | 较高（需结合HTTPS加密）   |
+| **缓存机制**   | 可缓存（提升重复请求效率）       | 默认不可缓存（避免数据不一致）  |
+| **幂等性**    | 幂等（多次请求结果相同）        | 非幂等（可能触发不同操作）    |
+| **适用场景**   | 搜索、分页、获取静态资源        | 表单提交、文件上传、敏感信息传输 |
+
+---
+
+### 4.1.2处理汉字信息
+当用request对象获取用户提交的汉字字符时,会出现乱码问题,所以对含有汉字字符的信息必须进行特殊的处理。首先,将获取的字符串用ISO-8859-1进行编码，并将编码存放到一个字节数组中，然后再将这个数组转化为字符串对象即可.如下所示：
+```java
+String str=request.getParameter("girl");
+byte b[]=str.getBytes("ISO-8859-1");
+str=new String(b);
+```
+
+### 4.1.3常用方法
+| 方法名               | 描述                                                                 |
+|----------------------|----------------------------------------------------------------------|
+| getProtocol()        | 获取请求使用的通信协议，如http/1.1等。                                |
+| getServletPath()     | 获取请求的JSP页面所在的目录。                                         |
+| getContentLength()   | 获取HTTP请求的长度。                                                 |
+| getMethod()          | 获取表单提交信息的方式，如POST或GET。                                 |
+| getHeader(String s)  | 获取请求中头的值。                                                   |
+| getHeaderNames()     | 获取头名字的一个枚举。                                               |
+| getHeaders(String s) | 获取头的全部值的一个枚举。                                           |
+| getRemoteAddr()      | 获取客户的IP地址。                                                   |
+| getRemoteHost()      | 获取客户机的名称（如果获取不到，就获取IP地址）。                       |
+| getServerName()      | 获取服务器的名称。                                                   |
+| getServerPort()      | 获取服务器的端口号。                                                 |
+| getParameterNames()  | 获取表单提交的信息体部分中name参数值的一个枚举。                       |
+### 4.1.4使用Tag文件处理有关数据
+JSP页面使用request对象获取用户提交的数据，然后使用Tag标记调用Tag文件，并将必要的数据传递给Tag文件。Tag文件负责处理数据，根据需要将处理结果显示给用户或返回给调用它的JSP页面。
+
+### 4.1.5处理HTML标记
+#### 4.1.5.1Form
+FORM标记被习惯地称作表单，用户经常需要使用表单提交数据。表单的一般格式是：
+```jsp
+<FORM  method= get| post  action= "提交信息的目的地页面"  name="表单的名字">数据提交手段部分</FORM>
+```
+
+提交手段包括：通过文本框、列表、文本区等
+#### 4.1.5.2input
+表单标记Form将Input标记作为子标记来指定表单中数据的输入方式以及表单的提交键。Input标记中的type属性可以指定输入方式的GUI对象，name属性用来指定这个GUI对象的名称。Input标记的基本格式：
+```jsp
+   <Input type="输入对象的GUI类型" name="名字" >
+```
+服务器通过属性name指定的名字来获取“输入对象的GUI类型”中提交的数据。“输入对象GUI类型”可以是：text（文本框）、checkbox（检查框）、submit（提交键）等。
+
+#### 4.1.5.3Select和Option
+下拉列表和滚动列表通过 `<Select>` 和 `<Option>` 标签来定义。基本格式如下：
+1. 下拉列表
+```html
+<Select>
+  <Option value="value1">选项1</Option>
+  <Option value="value2">选项2</Option>
+  <Option value="value3">选项3</Option>
+</Select>
+```
+2. 滚动列表
+
+在 `<Select>` 标签中添加 `size` 属性，指定可见行的数量，从而形成滚动列表。`size` 的值是滚动列表可见行的个数。
+
+```html
+<Select name="shulie" size=2>
+  <Option value="cat">你选了小猫</Option>
+  <Option value="1">计算1到n的连续和</Option>
+  <Option value="dog">你选了小狗</Option>
+  <Option value="2">计算1到n的平方和</Option>
+  ...
+</Select>
+```
+
+#### 4.1.5.4TextArea
+TextArea 标记在表单中指定一个能输入多行文本的文本区域。
+基本格式为：
+```jsp
+<TextArea  name= "ilovethisgame" Rows= "4" Cols= "20"></TextArea>
